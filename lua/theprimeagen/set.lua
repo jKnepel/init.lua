@@ -29,3 +29,6 @@ vim.opt.signcolumn = "yes"
 vim.opt.isfname:append("@-@")
 
 vim.opt.updatetime = 50
+
+-- lets auto-session restore buffer-local options (e.g. filetype settings)
+vim.opt.sessionoptions:append("localoptions")

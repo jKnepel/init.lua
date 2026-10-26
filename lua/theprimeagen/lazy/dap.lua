@@ -27,7 +27,7 @@ local function create_nav_options(name)
     return {
         group = "DapGroup",
         pattern = string.format("*%s*", name),
-        callback = navigate
+        callback = navigate,
     }
 end
 
@@ -68,9 +68,8 @@ return {
             vim.keymap.set("n", "<leader>B", function()
                 dap.set_breakpoint(vim.fn.input("Breakpoint condition: "))
             end, { desc = "Debug: Set Conditional Breakpoint" })
-        end
+        end,
     },
-
 
     {
         "rcarriga/nvim-dap-ui",
@@ -119,17 +118,24 @@ return {
                 pcall(dapui.toggle, layout_config.index)
             end
 
-            vim.keymap.set("n", "<leader>dr", function() toggle_debug_ui("repl") end, { desc = "Debug: toggle repl ui" })
-            vim.keymap.set("n", "<leader>ds", function() toggle_debug_ui("stacks") end,
-                { desc = "Debug: toggle stacks ui" })
-            vim.keymap.set("n", "<leader>dw", function() toggle_debug_ui("watches") end,
-                { desc = "Debug: toggle watches ui" })
-            vim.keymap.set("n", "<leader>db", function() toggle_debug_ui("breakpoints") end,
-                { desc = "Debug: toggle breakpoints ui" })
-            vim.keymap.set("n", "<leader>dS", function() toggle_debug_ui("scopes") end,
-                { desc = "Debug: toggle scopes ui" })
-            vim.keymap.set("n", "<leader>dc", function() toggle_debug_ui("console") end,
-                { desc = "Debug: toggle console ui" })
+            vim.keymap.set("n", "<leader>dr", function()
+                toggle_debug_ui("repl")
+            end, { desc = "Debug: toggle repl ui" })
+            vim.keymap.set("n", "<leader>ds", function()
+                toggle_debug_ui("stacks")
+            end, { desc = "Debug: toggle stacks ui" })
+            vim.keymap.set("n", "<leader>dw", function()
+                toggle_debug_ui("watches")
+            end, { desc = "Debug: toggle watches ui" })
+            vim.keymap.set("n", "<leader>db", function()
+                toggle_debug_ui("breakpoints")
+            end, { desc = "Debug: toggle breakpoints ui" })
+            vim.keymap.set("n", "<leader>dS", function()
+                toggle_debug_ui("scopes")
+            end, { desc = "Debug: toggle scopes ui" })
+            vim.keymap.set("n", "<leader>dc", function()
+                toggle_debug_ui("console")
+            end, { desc = "Debug: toggle console ui" })
 
             vim.api.nvim_create_autocmd("BufEnter", {
                 group = "DapGroup",
@@ -159,6 +165,51 @@ return {
                     dapui.eval(body.output) -- Sends stdout/stderr to Console
                 end
             end
+        end,
+    },
+
+    {
+        "jay-babu/mason-nvim-dap.nvim",
+        dependencies = {
+            "williamboman/mason.nvim",
+            "mfussenegger/nvim-dap",
+            "neovim/nvim-lspconfig",
+        },
+        config = function()
+            require("mason-nvim-dap").setup({
+                ensure_installed = {
+                    "delve",
+                },
+                automatic_installation = true,
+                handlers = {
+                    function(config)
+                        require("mason-nvim-dap").default_setup(config)
+                    end,
+                    delve = function(config)
+                        table.insert(config.configurations, 1, {
+                            args = function()
+                                return vim.split(vim.fn.input("args> "), " ")
+                            end,
+                            type = "delve",
+                            name = "file",
+                            request = "launch",
+                            program = "${file}",
+                            outputMode = "remote",
+                        })
+                        table.insert(config.configurations, 1, {
+                            args = function()
+                                return vim.split(vim.fn.input("args> "), " ")
+                            end,
+                            type = "delve",
+                            name = "file args",
+                            request = "launch",
+                            program = "${file}",
+                            outputMode = "remote",
+                        })
+                        require("mason-nvim-dap").default_setup(config)
+                    end,
+                },
+            })
         end,
     },
 }
