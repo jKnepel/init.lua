@@ -15,10 +15,6 @@ return {
     },
 
     config = function()
-        require("conform").setup({
-            formatters_by_ft = {
-            }
-        })
         local cmp = require('cmp')
         local cmp_lsp = require("cmp_nvim_lsp")
         local capabilities = vim.tbl_deep_extend(
@@ -98,6 +94,18 @@ return {
                     })
                 end,
             }
+        })
+
+        -- clangd comes from the system (pacman), not mason, so the handlers above never see it
+        require("lspconfig").clangd.setup({
+            capabilities = capabilities,
+            cmd = {
+                "clangd",
+                "--background-index",
+                "--clang-tidy",
+                "--header-insertion=never",
+                "--completion-style=detailed",
+            },
         })
 
         local cmp_select = { behavior = cmp.SelectBehavior.Select }
