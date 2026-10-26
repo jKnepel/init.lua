@@ -36,7 +36,12 @@ return {
 				pattern = "VeryLazy",
 				once = true,
 				callback = function()
-					require("nvim-treesitter").install(parsers)
+					local treesitter = require("nvim-treesitter")
+					if type(treesitter.install) == "function" then
+						treesitter.install(parsers)
+					else
+						require("nvim-treesitter.install").ensure_installed(parsers)
+					end
 				end,
 			})
 		end,

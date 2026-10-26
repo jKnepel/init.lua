@@ -16,9 +16,13 @@ return {
 				javascript = { "prettier" },
 				typescript = { "prettier" },
 				json = { "prettier" },
+				jsonc = { "prettier" },
 				elixir = { "mix" },
 			},
 			formatters = {
+				prettier = {
+					prepend_args = { "--tab-width", "4" },
+				},
 				["clang-format"] = {
 					prepend_args = { "-style=file", "-fallback-style=LLVM" },
 				},
