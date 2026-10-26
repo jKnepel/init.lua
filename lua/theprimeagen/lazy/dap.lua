@@ -39,6 +39,27 @@ return {
             local dap = require("dap")
             dap.set_log_level("DEBUG")
 
+            -- gdb >= 14 speaks DAP natively, no extra adapter needed
+            dap.adapters.gdb = {
+                type = "executable",
+                command = "gdb",
+                args = { "--interpreter=dap", "--eval-command", "set print pretty on" },
+            }
+
+            dap.configurations.cpp = {
+                {
+                    name = "Launch executable",
+                    type = "gdb",
+                    request = "launch",
+                    program = function()
+                        return vim.fn.input("Path to executable: ", vim.fn.getcwd() .. "/build/", "file")
+                    end,
+                    cwd = "${workspaceFolder}",
+                    stopAtBeginningOfMainSubprogram = false,
+                },
+            }
+            dap.configurations.c = dap.configurations.cpp
+
             vim.keymap.set("n", "<F8>", dap.continue, { desc = "Debug: Continue" })
             vim.keymap.set("n", "<F10>", dap.step_over, { desc = "Debug: Step Over" })
             vim.keymap.set("n", "<F11>", dap.step_into, { desc = "Debug: Step Into" })
@@ -138,47 +159,6 @@ return {
                     dapui.eval(body.output) -- Sends stdout/stderr to Console
                 end
             end
-        end,
-    },
-
-    {
-        "jay-babu/mason-nvim-dap.nvim",
-        dependencies = {
-            "williamboman/mason.nvim",
-            "mfussenegger/nvim-dap",
-            "neovim/nvim-lspconfig",
-        },
-        config = function()
-            require("mason-nvim-dap").setup({
-                ensure_installed = {
-                    "delve",
-                },
-                automatic_installation = true,
-                handlers = {
-                    function(config)
-                        require("mason-nvim-dap").default_setup(config)
-                    end,
-                    delve = function(config)
-                        table.insert(config.configurations, 1, {
-                            args = function() return vim.split(vim.fn.input("args> "), " ") end,
-                            type = "delve",
-                            name = "file",
-                            request = "launch",
-                            program = "${file}",
-                            outputMode = "remote",
-                        })
-                        table.insert(config.configurations, 1, {
-                            args = function() return vim.split(vim.fn.input("args> "), " ") end,
-                            type = "delve",
-                            name = "file args",
-                            request = "launch",
-                            program = "${file}",
-                            outputMode = "remote",
-                        })
-                        require("mason-nvim-dap").default_setup(config)
-                    end,
-                },
-            })
         end,
     },
 }

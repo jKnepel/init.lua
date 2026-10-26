@@ -17,6 +17,12 @@ return {
 				"json",
 				"gitignore",
 				"go",
+				"c",
+				"cpp",
+				"cmake",
+				"glsl",
+				"markdown",
+				"markdown_inline",
 			}
 
 			local group = vim.api.nvim_create_augroup("ThePrimeagenTreesitter", { clear = true })
